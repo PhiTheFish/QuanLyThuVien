@@ -15,7 +15,7 @@ public class DangNhap extends JFrame {
     private JPasswordField txtPassword;
 
     // Kết nối CSD
-    // Thầy cô khi chấm bài chỉ cần mở file config.properties ra sửa lại tên server cho đúng với máy mình mà không cần chạm vào mã nguồn Java
+    // Thay đổi 'DESKTOP-ASI6E70\SQLEXPRESS:1433' thành tên Server/Instance trên máy thầy cô để có thể kết nối
     String url = "jdbc:sqlserver://DESKTOP-ASI6E70\\SQLEXPRESS:1433;databaseName=QuanLyThuvien;encrypt=true;trustServerCertificate=true;";
     String dbUser = "admin";
     String dbPass = "123456";
