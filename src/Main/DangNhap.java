@@ -15,6 +15,7 @@ public class DangNhap extends JFrame {
     private JTextField txtUsername;
     private JPasswordField txtPassword;
 
+<<<<<<< HEAD
     // Hàm lấy kết nối CSDL Microsoft Access dùng chung
     public static Connection getConnection() throws Exception {
         Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
@@ -22,6 +23,13 @@ public class DangNhap extends JFrame {
         String url = "jdbc:ucanaccess://" + dbFile.getAbsolutePath();
         return DriverManager.getConnection(url);
     }
+=======
+    // Kết nối CSD
+    // Thay đổi 'DESKTOP-ASI6E70\SQLEXPRESS:1433' thành tên Server/Instance trên máy thầy cô để có thể kết nối
+    String url = "jdbc:sqlserver://DESKTOP-ASI6E70\\SQLEXPRESS:1433;databaseName=QuanLyThuvien;encrypt=true;trustServerCertificate=true;";
+    String dbUser = "admin";
+    String dbPass = "123456";
+>>>>>>> 8eab3cece1b31dfebaa8a8eca90e288399f59c88
 
     public DangNhap() {
         setTitle("Đăng Nhập Hệ Thống");
