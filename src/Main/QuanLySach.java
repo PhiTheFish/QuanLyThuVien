@@ -15,7 +15,6 @@ public class QuanLySach extends JFrame {
     private JTable table;
     private DefaultTableModel model;
 
-<<<<<<< HEAD
     // Hàm lấy kết nối CSDL Microsoft Access
     private Connection getConnection() throws Exception {
         Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
@@ -23,13 +22,6 @@ public class QuanLySach extends JFrame {
         String url = "jdbc:ucanaccess://" + dbFile.getAbsolutePath();
         return DriverManager.getConnection(url);
     }
-=======
-    // Kết nối CSD
-    // Thay đổi 'DESKTOP-ASI6E70\SQLEXPRESS:1433' thành tên Server/Instance trên máy thầy cô để có thể kết nối
-    String url = "jdbc:sqlserver://DESKTOP-ASI6E70\\SQLEXPRESS:1433;databaseName=QuanLyThuvien;encrypt=true;trustServerCertificate=true;";
-    String user = "admin";
-    String pass = "123456";
->>>>>>> 8eab3cece1b31dfebaa8a8eca90e288399f59c88
 
     public QuanLySach() {
         setTitle("Phần Mềm Quản Lý Thư Viện - Quản Lý Sách");
