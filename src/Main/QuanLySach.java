@@ -6,6 +6,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.sql.*;
 
 public class QuanLySach extends JFrame {
@@ -14,10 +15,13 @@ public class QuanLySach extends JFrame {
     private JTable table;
     private DefaultTableModel model;
 
-    // Kết nối CSD
-    String url = "jdbc:sqlserver://DESKTOP-ASI6E70\\SQLEXPRESS:1433;databaseName=QuanLyThuvien;encrypt=true;trustServerCertificate=true;";
-    String user = "admin";
-    String pass = "123456";
+    // Hàm lấy kết nối CSDL Microsoft Access
+    private Connection getConnection() throws Exception {
+        Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
+        File dbFile = new File("QuanLyThuvien.accdb");
+        String url = "jdbc:ucanaccess://" + dbFile.getAbsolutePath();
+        return DriverManager.getConnection(url);
+    }
 
     public QuanLySach() {
         setTitle("Phần Mềm Quản Lý Thư Viện - Quản Lý Sách");
@@ -26,7 +30,6 @@ public class QuanLySach extends JFrame {
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
-        //Tiêu đề
         JPanel panelTop = new JPanel(new FlowLayout(FlowLayout.LEFT));
         panelTop.setBackground(new Color(230, 235, 245));
         JLabel lblTitle = new JLabel("📚 Danh Sách Sách Trong Thư Viện");
@@ -35,7 +38,6 @@ public class QuanLySach extends JFrame {
         panelTop.add(lblTitle);
         add(panelTop, BorderLayout.NORTH);
 
-        // Bảng ở giữa
         model = new DefaultTableModel();
         model.addColumn("Mã Sách");
         model.addColumn("Tên Sách");
@@ -45,10 +47,8 @@ public class QuanLySach extends JFrame {
         table = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(table);
         
-        // Nhập và nút
         JPanel panelBottom = new JPanel(new BorderLayout(10, 10));
         
-        // Các ô nhập liệu (Bên trái)
         JPanel panelFields = new JPanel(new GridLayout(4, 2, 10, 10));
         panelFields.setBorder(BorderFactory.createTitledBorder(
             BorderFactory.createEtchedBorder(), "Thông tin chi tiết", 
@@ -57,7 +57,7 @@ public class QuanLySach extends JFrame {
 
         panelFields.add(new JLabel("  Mã Sách:"));
         txtMaSach = new JTextField();
-        txtMaSach.setEditable(false); // Mã tự tăng nên không cho sửa trực tiếp
+        txtMaSach.setEditable(false);
         txtMaSach.setBackground(new Color(240, 240, 240));
         panelFields.add(txtMaSach);
 
@@ -73,7 +73,6 @@ public class QuanLySach extends JFrame {
         txtNXB = new JTextField();
         panelFields.add(txtNXB);
 
-        // Các nút thao tác ADD, UPDATE, DELETE (Bên phải)
         JPanel panelButtons = new JPanel(new GridLayout(3, 1, 10, 15));
         panelButtons.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         
@@ -92,17 +91,14 @@ public class QuanLySach extends JFrame {
         panelBottom.add(panelFields, BorderLayout.CENTER);
         panelBottom.add(panelButtons, BorderLayout.EAST);
 
-        // Gộp bảng và phần nhập liệu lại
         JPanel panelCenterMain = new JPanel(new BorderLayout(5, 5));
         panelCenterMain.add(scrollPane, BorderLayout.CENTER);
         panelCenterMain.add(panelBottom, BorderLayout.SOUTH);
         
         add(panelCenterMain, BorderLayout.CENTER);
 
-        // Cho dữ liệu từ SQL lên bảng
         loadDataToTable();
 
-        // Ấn trên bảng
         table.getSelectionModel().addListSelectionListener(_ -> {
             int row = table.getSelectedRow();
             if (row >= 0) {
@@ -121,15 +117,13 @@ public class QuanLySach extends JFrame {
                     JOptionPane.showMessageDialog(null, "Vui lòng nhập tên sách và tác giả!");
                     return;
                 }
-                try {
-                    Connection conn = DriverManager.getConnection(url, user, pass);
-                    String sql = "INSERT INTO Sach (TenSach, TacGia, NhaXuatBản) VALUES (?, ?, ?)";
+                try (Connection conn = getConnection()) {
+                    String sql = "INSERT INTO Sach (TenSach, TacGia, NhaXuatBan) VALUES (?, ?, ?)";
                     PreparedStatement pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, txtTenSach.getText());
                     pstmt.setString(2, txtTacGia.getText());
                     pstmt.setString(3, txtNXB.getText());
                     pstmt.executeUpdate();
-                    conn.close();
                     
                     JOptionPane.showMessageDialog(null, "Thêm sách thành công!");
                     loadDataToTable();
@@ -150,16 +144,14 @@ public class QuanLySach extends JFrame {
                     JOptionPane.showMessageDialog(null, "Vui lòng chọn dòng cần sửa trên bảng!");
                     return;
                 }
-                try {
-                    Connection conn = DriverManager.getConnection(url, user, pass);
-                    String sql = "UPDATE Sach SET TenSach = ?, TacGia = ?, NhaXuatBản = ? WHERE MaSach = ?";
+                try (Connection conn = getConnection()) {
+                    String sql = "UPDATE Sach SET TenSach = ?, TacGia = ?, NhaXuatBan = ? WHERE MaSach = ?";
                     PreparedStatement pstmt = conn.prepareStatement(sql);
                     pstmt.setString(1, txtTenSach.getText());
                     pstmt.setString(2, txtTacGia.getText());
                     pstmt.setString(3, txtNXB.getText());
-                    pstmt.setString(4, txtMaSach.getText());
+                    pstmt.setInt(4, Integer.parseInt(txtMaSach.getText()));
                     pstmt.executeUpdate();
-                    conn.close();
                     
                     JOptionPane.showMessageDialog(null, "Cập nhật thành công!");
                     loadDataToTable();
@@ -171,7 +163,7 @@ public class QuanLySach extends JFrame {
             }
         });
 
-        // Nút Xóa
+        // Nút X óa
         btnDelete.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -182,13 +174,11 @@ public class QuanLySach extends JFrame {
                 }
                 int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc chắn muốn xóa cuốn sách này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
-                    try {
-                        Connection conn = DriverManager.getConnection(url, user, pass);
+                    try (Connection conn = getConnection()) {
                         String sql = "DELETE FROM Sach WHERE MaSach = ?";
                         PreparedStatement pstmt = conn.prepareStatement(sql);
-                        pstmt.setString(1, txtMaSach.getText());
+                        pstmt.setInt(1, Integer.parseInt(txtMaSach.getText()));
                         pstmt.executeUpdate();
-                        conn.close();
                         
                         JOptionPane.showMessageDialog(null, "Xóa thành công!");
                         loadDataToTable();
@@ -202,11 +192,9 @@ public class QuanLySach extends JFrame {
         });
     }
 
-    // Hàm tải dữ liệu từ cơ sở dữ liệu SQL Server lên JTable
     public void loadDataToTable() {
         model.setRowCount(0);
-        try {
-            Connection conn = DriverManager.getConnection(url, user, pass);
+        try (Connection conn = getConnection()) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM Sach");
             while (rs.next()) {
@@ -214,16 +202,14 @@ public class QuanLySach extends JFrame {
                     rs.getInt("MaSach"),
                     rs.getString("TenSach"),
                     rs.getString("TacGia"),
-                    rs.getString("NhaXuatBản")
+                    rs.getString("NhaXuatBan")
                 });
             }
-            conn.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    // Hàm làm trống các ô nhập liệu sau khi thao tác
     public void clearForm() {
         txtMaSach.setText("");
         txtTenSach.setText("");
