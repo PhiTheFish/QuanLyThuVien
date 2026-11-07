@@ -12,10 +12,10 @@ import java.sql.ResultSet;
 
 public class DangNhap extends JFrame {
     private static final long serialVersionUID = 1L;
-    private JTextField txtUsername;
+    private JTextField txtUsername; 
     private JPasswordField txtPassword;
 
-    // Hàm lấy kết nối CSDL Microsoft Access dùng chung
+    // Hàm lấy kết nối CSDL Microsoft Access dùng chung 
     public static Connection getConnection() throws Exception {
         Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
         File dbFile = new File("QuanLyThuvien.accdb");

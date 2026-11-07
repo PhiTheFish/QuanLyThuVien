@@ -15,7 +15,7 @@ public class QuanLySach extends JFrame {
     private JTable table;
     private DefaultTableModel model;
 
-    // Hàm lấy kết nối CSDL Microsoft Access
+    // Hàm lấy kết nối CSDL Microsoft Access 
     private Connection getConnection() throws Exception {
         Class.forName("net.ucanaccess.jdbc.UcanaccessDriver");
         File dbFile = new File("QuanLyThuvien.accdb");
